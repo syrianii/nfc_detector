@@ -1,3 +1,5 @@
+
+
 import 'dart:async';
 import 'dart:convert';
 
@@ -18,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> _rawStream = [];
 
   NFCTag tag;
+  NFCTag tempTag;
   bool _reading = false;
 
   checkNFCAvailability() async {
@@ -45,8 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(availability.toString()),
-        Text("NDEF Available : " + tag.ndefAvailable.toString()),
-        Text("NFC Type : " + tag.ndefType),
         Expanded(
           flex: 1,
           child: ListView.builder(
@@ -83,12 +84,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     try {
                       tag = (await FlutterNfcKit.poll(
                           timeout: Duration(seconds: 10)));
+                      tempTag = tag;
 
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(
                         jsonEncode(tag),
                         style: TextStyle(color: Colors.orangeAccent),
                       )));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                            tag.ndefAvailable.toString(),
+                            style: TextStyle(color: Colors.orangeAccent),
+                          )));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                            tag.ndefType,
+                            style: TextStyle(color: Colors.orangeAccent),
+                          )));
 
                       if (tag.ndefAvailable) {
                         for (var record in await FlutterNfcKit.readNDEFRecords(
@@ -118,6 +130,8 @@ class _HomeScreenState extends State<HomeScreen> {
             : Text(
                 "Please turn on NFC First , if you don't have Nfc then you can't run the app",
               ),
+
+
       ],
     ));
   }
